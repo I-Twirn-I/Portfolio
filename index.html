@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PORTFOLIO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Orbitron:wght@400;700;900&family=Caveat:wght@700&family=Barlow+Condensed:ital,wght@1,800&display=swap" rel="stylesheet">
+    <style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+    --navy:#010d1e;
+    --blue-dark:#001a4d;
+    --blue-mid:#0044bb;
+    --blue-bright:#0077ff;
+    --cyan:#00ccff;
+    --teal:#40c8d8;
+    --red:#ff2233;
+    --gold:#e8c84a;
+    --text-dim:rgba(180,220,255,0.5);
+    --font-menu:'Bebas Neue',sans-serif;
+    --font-ui:'Rajdhani',sans-serif;
+    --font-mono:'Orbitron',sans-serif;
+}
+
+html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font-family:var(--font-ui)}
+
+/* ── WIPE TRANSITION ── */
+#wipe{
+    position:fixed;top:-5%;left:0;
+    width:110%;height:110%;
+    background:linear-gradient(108deg,#0033aa 0%,#0055ee 60%,#0066ff 100%);
+    transform:translateX(-115%) skewX(-8deg);
+    z-index:9999;pointer-events:none;will-change:transform;
+}
+#wipe.in {transform:translateX(0%)   skewX(-8deg);transition:transform 0.22s cubic-bezier(0.4,0,1,1)}
+#wipe.out{transform:translateX(115%) skewX(-8deg);transition:transform 0.22s cubic-bezier(0,0,0.6,1)}
+
+/* ── SCREENS ── */
+.screen{position:fixed;inset:0;display:none;z-index:1}
+.screen.active{display:flex}
+
+/* ══════════════════════════════
+   MENU SCREEN
+══════════════════════════════ */
+#screen-menu{
+    overflow:hidden;
+    background:transparent;
+}
+
+/* ── Sol üst "kuzey's persona" başlığı ── */
+.menu-title{
+    position:absolute;
+    top:0.8rem;
+    left:1rem;
+    z-index:20;
+    line-height:0.9;
+    user-select:none;
+}
+.menu-title-name,
+.menu-title-sub{
+    display:block;
+    font-family:'Barlow Condensed','Impact','Arial Narrow',sans-serif;
+    font-weight:800;
+    font-style:italic;
+    color:#1a1a1a;
+    letter-spacing:2px;
+}
+.menu-title-name{
+    font-size:clamp(4.5rem,9vw,8rem);
+}
+.menu-title-sub{
+    font-size:clamp(4.5rem,9vw,8rem);
+    margin-top:-0.12em;
+}
+
+/* ── Karakter alanı (mavi arka planda, şeritlerden sonra) ── */
+.menu-char{
+    position:absolute;
+    left:7%;top:0;bottom:0;
+    width:42%;
+    display:flex;align-items:flex-end;justify-content:center;
+    overflow:hidden;
+    z-index:5;
+}
+
+/* ── Karakter animasyonları ── */
+@keyframes charFloat{
+    0%,100%{ transform:translateY(0px) rotate(-1deg); }
+    50%    { transform:translateY(-18px) rotate(1deg); }
+}
+@keyframes charSway{
+    0%,100%{ transform:translateX(0px) rotate(-0.5deg) scaleX(1); }
+    30%    { transform:translateX(-6px) rotate(-2deg) scaleX(0.98); }
+    70%    { transform:translateX(5px)  rotate(1.5deg) scaleX(1.01); }
+}
+@keyframes charGlow{
+    0%,100%{ filter:drop-shadow(0 0 20px rgba(100,200,255,0.4)) drop-shadow(0 0 50px rgba(0,120,255,0.2)); }
+    50%    { filter:drop-shadow(0 0 40px rgba(100,220,255,0.7)) drop-shadow(0 0 80px rgba(0,150,255,0.4)); }
+}
+/* Placeholder silüet parçaları animasyonu */
+@keyframes partFloat1{
+    0%,100%{ transform:translateY(0) translateX(0) rotate(0deg); }
+    50%    { transform:translateY(-12px) translateX(3px) rotate(3deg); }
+}
+@keyframes partFloat2{
+    0%,100%{ transform:translateY(0) rotate(0deg); }
+    40%    { transform:translateY(-8px) rotate(-5deg); }
+    80%    { transform:translateY(-3px) rotate(3deg); }
+}
+@keyframes inkFlow{
+    0%,100%{ stroke-dashoffset:0; opacity:0.8; }
+    50%    { stroke-dashoffset:-20px; opacity:0.4; }
+}
+
+/* placeholder — karakter PNG eklenene kadar */
+.char-placeholder{
+    width:90%;height:96%;
+    display:flex;align-items:flex-end;justify-content:center;
+    position:relative;z-index:1;
+}
+/* Animasyonlu CSS silüeti */
+.char-placeholder svg{
+    width:100%;height:100%;
+    animation:charFloat 3.5s ease-in-out infinite, charGlow 4s ease-in-out infinite;
+    transform-origin:bottom center;
+    filter:drop-shadow(0 0 20px rgba(100,200,255,0.5));
+    overflow:visible;
+}
+
+/* kullanıcı fotoğrafı — otomatik animasyonlu */
+.char-img{
+    width:100%;max-height:100%;
+    object-fit:contain;object-position:bottom center;
+    position:relative;z-index:1;
+    filter:
+        drop-shadow(0 0 25px rgba(100,200,255,0.5))
+        drop-shadow(0 0 60px rgba(0,100,255,0.3));
+    /* P3R karakteri gibi yüzer */
+    animation: charFloat 3.5s ease-in-out infinite;
+    transform-origin: bottom center;
+}
+
+/* ── Menü öğeleri ── */
+.menu-center{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-20%,-50%);
+    z-index:15;
+    display:flex;
+    align-items:flex-start;
+}
+
+.menu-list{
+    list-style:none;
+    display:flex;
+    flex-direction:column;
+    gap:0;
+    padding-top:0.8rem;
+}
+
+.menu-item{
+    position:relative;
+    cursor:pointer;
+    line-height:1;
+    user-select:none;
+    padding-left:4px;
+}
+
+/* Seçilmemiş: CYAN/TURKUAZ */
+.menu-item-text{
+    font-family:'Impact','Arial Narrow',sans-serif;
+    font-style:italic;
+    display:inline-block;
+    color:#00ccff;
+    /* Oyunda her item biraz farklı büyüklükte — varsayılan */
+    font-size:clamp(1.6rem,2.8vw,2.6rem);
+    text-transform:uppercase;
+    letter-spacing:1px;
+    line-height:1.05;
+    transition:color .08s,font-size .15s cubic-bezier(.4,0,.2,1);
+    position:relative;
+}
+
+/* Seçili: KIRMIZI + çok büyük — en üstteki item */
+.menu-item.selected .menu-item-text{
+    color:#cc0011;
+    font-size:clamp(3rem,5.5vw,5.5rem);
+    text-shadow:3px 3px 0 rgba(100,0,8,0.3);
+    letter-spacing:2px;
+    line-height:0.88;
+}
+
+/* Hover */
+.menu-item:not(.selected):hover .menu-item-text{
+    color:#55ddff;
+}
+
+
+/* Seçili item arkasındaki BEYAZ/PEMBE flama — sağ üste diagonal çıkıyor */
+.menu-flag{
+    display:none;
+    position:absolute;
+    /* Metnin SAĞ tarafına, biraz yukarı taşıyor */
+    left:0;
+    top:-20%;
+    width:100%;
+    height:130%;
+    background:linear-gradient(125deg,
+        rgba(255,255,255,0.95) 0%,
+        rgba(255,210,230,0.9) 50%,
+        rgba(255,150,180,0.3) 100%
+    );
+    /* Sağ üst köşe yukarı çıkan paralel dörtgen */
+    clip-path:polygon(0% 20%,85% 0%,100% 80%,15% 100%);
+    z-index:-1;
+}
+.menu-item.selected .menu-flag{display:block}
+
+/* ── Alt sağ kontroller — "Use a Skill / Command" stili ── */
+.menu-controls{
+    position:absolute;
+    bottom:1rem;right:1.2rem;
+    text-align:right;z-index:20;
+}
+.ctrl-title{
+    font-family:'Impact','Arial Narrow',sans-serif;
+    font-style:italic;
+    font-size:1.1rem;
+    color:#ffffff;
+    letter-spacing:1px;
+    display:block;
+    line-height:1.1;
+}
+.ctrl-sub{
+    font-size:0.52rem;
+    color:rgba(255,255,255,0.55);
+    letter-spacing:3px;
+    text-transform:uppercase;
+    border-bottom:1px solid rgba(255,255,255,0.3);
+    padding-bottom:0.25rem;
+    margin-bottom:0.3rem;
+    display:block;
+}
+.ctrl-btns{
+    font-size:0.7rem;
+    color:#ffffff;
+    letter-spacing:1px;
+    font-family:var(--font-mono);
+}
+
+/* ══════════════════════════════
+   CONTENT SCREENS (shared)
+══════════════════════════════ */
+.content-screen{
+    flex-direction:column;
+    background:rgba(0,5,18,0.55);
+    overflow-y:auto;overflow-x:hidden;
+}
+
+/* Geri butonu — P3R Impact stili */
+.back-btn{
+    position:fixed;top:1.2rem;left:1.2rem;z-index:50;
+    background:rgba(0,0,0,0.5);
+    border:2px solid rgba(255,255,255,0.3);
+    color:#fff;
+    font-family:'Impact','Arial Narrow',sans-serif;
+    font-style:italic;font-size:1rem;
+    letter-spacing:3px;padding:.4rem 1rem;cursor:pointer;
+    text-transform:uppercase;transition:all .15s;
+    clip-path:polygon(8px 0%,100% 0%,100% 100%,0% 100%,0% 8px);
+}
+.back-btn:hover{background:rgba(200,0,20,0.7);border-color:#fff;}
+
+/* Header */
+.content-header{
+    padding:3.5rem 4rem 1.5rem;
+    position:relative;
+}
+.content-header::after{
+    content:'';position:absolute;bottom:0;left:4rem;right:4rem;height:2px;
+    background:linear-gradient(90deg,rgba(255,255,255,0.6),rgba(0,200,255,0.4),transparent);
+}
+
+/* Başlık — büyük Impact italic, P3R menü stili */
+.c-tag{
+    font-family:'Impact','Arial Narrow',sans-serif;
+    font-style:italic;font-size:.75rem;
+    letter-spacing:5px;color:rgba(255,255,255,0.5);
+    margin-bottom:.2rem;display:block;text-transform:uppercase;
+}
+.c-title{
+    font-family:'Impact','Arial Narrow',sans-serif;
+    font-style:italic;
+    font-size:clamp(3.5rem,7vw,6.5rem);
+    letter-spacing:3px;line-height:0.9;
+    text-transform:uppercase;display:block;
+    text-shadow:3px 3px 0 rgba(0,0,0,0.3);
+}
+
+.content-body{padding:2rem 4rem 3rem;flex:1}
+
+/* ── fade-in ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.fi{opacity:0}
+.fi.show{animation:fadeUp .35s ease forwards}
+
+/* ── Ortak kart ── */
+.p-card,.s-cat,.q-card,.sl-card,.sys-box{
+    background:rgba(255,255,255,0.07);
+    border:1px solid rgba(255,255,255,0.15);
+    backdrop-filter:blur(4px);
+}
+.p-card,.s-cat,.sys-box{
+    padding:1.6rem;
+    clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%);
+}
+
+/* ══════════════════════════════
+   PERSONA — About
+══════════════════════════════ */
+#screen-persona .c-title{color:#00eeff;}
+
+.persona-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start}
+
+.p-lbl{
+    font-family:'Impact','Arial Narrow',sans-serif;font-style:italic;
+    font-size:.7rem;letter-spacing:3px;color:var(--cyan);
+    margin-bottom:.2rem;text-transform:uppercase;
+}
+.p-val{font-size:1.05rem;font-weight:600;margin-bottom:1.1rem;color:#fff;letter-spacing:1px}
+.p-bio{color:rgba(220,240,255,.85);font-size:.95rem;line-height:1.8}
+
+/* ══════════════════════════════
+   STATS — Skills
+══════════════════════════════ */
+#screen-stats .c-title{color:#ffffff;}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem}
+
+.s-cat-lbl{
+    font-family:'Impact','Arial Narrow',sans-serif;font-style:italic;
+    font-size:.75rem;letter-spacing:4px;color:var(--cyan);
+    margin-bottom:1rem;padding-bottom:.5rem;
+    border-bottom:1px solid rgba(0,200,255,0.25);
+    text-transform:uppercase;
+}
+.s-row{display:flex;align-items:center;gap:.9rem;margin-bottom:.8rem}
+.s-name{font-size:.85rem;letter-spacing:1px;color:rgba(220,240,255,.9);width:130px;flex-shrink:0}
+.s-bar{
+    flex:1;height:8px;background:rgba(0,0,0,0.4);
+    border:1px solid rgba(255,255,255,0.15);position:relative;overflow:hidden;
+    clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px));
+}
+.s-fill{
+    position:absolute;left:0;top:0;height:100%;width:0;
+    background:linear-gradient(90deg,rgba(0,100,200,.8),var(--cyan));
+    box-shadow:0 0 10px rgba(0,200,255,.5);
+    transition:width 1.2s cubic-bezier(.4,0,.2,1);
+}
+.s-fill.w{background:linear-gradient(90deg,rgba(180,60,0,.8),var(--gold));box-shadow:0 0 10px rgba(232,200,74,.5)}
+.s-pct{font-family:var(--font-mono);font-size:.6rem;color:var(--cyan);width:28px;text-align:right}
+
+/* ══════════════════════════════
+   QUEST — Projects
+══════════════════════════════ */
+#screen-quest .c-title{color:#ffcc00;}
+
+.quest-list{display:flex;flex-direction:column;gap:1rem}
+
+.q-card{
+    padding:1.2rem 1.6rem;
+    display:grid;grid-template-columns:44px 1fr auto;gap:1.2rem;align-items:center;
+    clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%);
+    text-decoration:none;color:inherit;transition:all .2s;
+}
+.q-card:hover{border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.12);transform:translateX(6px)}
+
+.q-num{
+    font-family:'Impact','Arial Narrow',sans-serif;font-style:italic;
+    font-size:1.6rem;color:rgba(255,255,255,.2);text-align:center;line-height:1;
+}
+.q-title{
+    font-family:'Impact','Arial Narrow',sans-serif;font-style:italic;
+    font-size:1.4rem;letter-spacing:2px;margin-bottom:.2rem;color:#fff;
+}
+.q-desc{font-size:.82rem;color:rgba(200,230,255,.7);line-height:1.5;margin-bottom:.5rem}
+.q-tags{display:flex;gap:.4rem;flex-wrap:wrap}
+.q-tag{
+    font-size:.62rem;letter-spacing:1px;padding:.15rem .5rem;
+    background:rgba(0,200,255,.1);border:1px solid rgba(0,200,255,.3);
+    color:var(--cyan);
+}
+.q-status{font-size:.62rem;letter-spacing:2px;padding:.22rem .7rem;border:1px solid;text-transform:uppercase;white-space:nowrap}
+.q-status.done{color:#44ffaa;border-color:rgba(68,255,170,.4)}
+.q-status.wip {color:#ffcc00;border-color:rgba(255,200,0,.4)}
+
+/* ══════════════════════════════
+   SOCIAL LINK
+══════════════════════════════ */
+#screen-social .c-title{color:#00eeff;}
+
+.social-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem}
+
+.sl-card{
+    padding:1.3rem;
+    display:flex;align-items:center;gap:1rem;
+    clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%);
+    text-decoration:none;color:inherit;transition:all .2s;
+}
+.sl-card:hover{border-color:rgba(0,200,255,.5);background:rgba(0,200,255,.1);transform:translateY(-3px)}
+
+.sl-rank{
+    width:44px;height:44px;flex-shrink:0;
+    background:rgba(0,200,255,.12);border:1px solid rgba(0,200,255,.4);
+    clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Impact','Arial Narrow',sans-serif;font-style:italic;
+    font-size:1.1rem;color:var(--cyan);
+}
+.sl-info{flex:1}
+.sl-arcana{font-size:.52rem;letter-spacing:3px;color:rgba(0,200,255,.6);margin-bottom:.15rem;font-family:var(--font-mono)}
+.sl-platform{font-size:1rem;font-weight:700;letter-spacing:1px;margin-bottom:.12rem;color:#fff}
+.sl-handle{font-size:.75rem;color:rgba(200,230,255,.6)}
+.sl-arrow{color:rgba(255,255,255,.25);transition:transform .2s;font-size:1.2rem}
+.sl-card:hover .sl-arrow{transform:translateX(5px);color:var(--cyan)}
+
+/* ══════════════════════════════
+   SYSTEM — Contact
+══════════════════════════════ */
+#screen-system .c-title{color:#ffffff;}
+
+.sys-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+
+.sys-box-title{
+    font-family:'Impact','Arial Narrow',sans-serif;font-style:italic;
+    font-size:.75rem;letter-spacing:4px;color:var(--cyan);
+    margin-bottom:.9rem;padding-bottom:.55rem;
+    border-bottom:1px solid rgba(0,200,255,.2);text-transform:uppercase;
+}
+.sys-row{display:flex;align-items:baseline;gap:.9rem;margin-bottom:.6rem}
+.sys-k{font-size:.72rem;letter-spacing:1px;color:rgba(200,230,255,.5);width:90px;flex-shrink:0}
+.sys-v{font-size:.9rem;font-weight:600;color:#fff}
+.sys-v a{color:var(--cyan);text-decoration:none}
+.sys-v a:hover{text-decoration:underline}
+
+/* ══════════════════════════════
+   KALICI ARKA PLAN VİDEOSU
+══════════════════════════════ */
+#menu-bg-video{
+    position:fixed;top:0;left:0;
+    width:100%;height:100%;
+    object-fit:cover;
+    z-index:0;
+}
+
+/* ── responsive ── */
+@media(max-width:768px){
+    .menu-char,.menu-party{display:none}
+    .menu-center{left:5%;top:55%}
+    .menu-item-text{font-size:2.2rem!important}
+    .menu-item.selected .menu-item-text,.menu-item:hover .menu-item-text{font-size:3rem!important}
+    .content-header,.content-body{padding-left:1.5rem;padding-right:1.5rem}
+    .persona-grid,.sys-grid{grid-template-columns:1fr}
+    .q-card{grid-template-columns:1fr;gap:.6rem}
+    .q-num{display:none}
+}
+    </style>
+</head>
+<body>
+
+<!-- Kalıcı arka plan videosu — her zaman oynar, tüm ekranlar üstünde değil -->
+<video id="menu-bg-video" autoplay muted playsinline>
+    <source src="persona-giris.mp4" type="video/mp4">
+</video>
+
+<div id="wipe"></div>
+
+<!-- ═══════════════════════════════
+     MENU SCREEN
+═══════════════════════════════ -->
+<div id="screen-menu" class="screen active">
+
+    <!-- Menü öğeleri -->
+    <div class="menu-center">
+        <ul class="menu-list">
+            <!--
+            !! DEĞİŞTİR: Menü isimlerini istediğin gibi değiştir !!
+            Oyundaki: SKILL, ITEM, EQUIP, PERSONA, STATUS, QUEST, SOCIAL LINK, CALENDAR, SYSTEM
+            -->
+            <li class="menu-item selected" data-target="screen-persona">
+                <span class="menu-item-text">PERSONA</span>
+                <span class="menu-flag"></span>
+            </li>
+            <li class="menu-item" data-target="screen-stats">
+                <span class="menu-item-text">STATS</span>
+            </li>
+            <li class="menu-item" data-target="screen-quest">
+                <span class="menu-item-text">QUEST LOG</span>
+            </li>
+            <li class="menu-item" data-target="screen-social">
+                <span class="menu-item-text">SOCIAL LINK</span>
+            </li>
+            <li class="menu-item" data-target="screen-system">
+                <span class="menu-item-text">SYSTEM</span>
+            </li>
+        </ul>
+    </div>
+
+
+</div>
+
+<!-- ═══════════════════════════════
+     PERSONA — Hakkımda
+═══════════════════════════════ -->
+<div id="screen-persona" class="screen content-screen">
+    <button class="back-btn" onclick="goBack()">← MENU</button>
+    <div class="content-header">
+        <div class="c-tag">// PERSONA</div>
+        <h1 class="c-title">HAKKIMDA</h1>
+    </div>
+    <div class="content-body">
+        <div class="persona-grid">
+            <div class="p-card fi">
+                <div class="p-lbl">İsim</div>
+                <div class="p-val">Kuzey Türe</div>
+
+                <div class="p-lbl">Rol / Unvan</div>
+                <div class="p-val">Tasarımcı</div>
+
+                <div class="p-lbl">Konum</div>
+                <div class="p-val">İstanbul → Stuttgart ●</div>
+
+                <div class="p-lbl">Durum</div>
+                <div class="p-val" style="color:#44ffaa">Aktif ●</div>
+            </div>
+            <div class="p-card fi" style="animation-delay:.1s">
+                <div class="p-lbl">Hakkımda</div>
+                <p class="p-bio">
+                    17 yaşındayım ve İstanbul'da büyüdüm. Üniversite için yakında Stuttgart'a taşınıyorum. Tasarımla kodun kesiştiği yerde çalışmayı seviyorum — pixel art'tan web projelerine, 2D illüstrasyondan yapay zeka destekli uygulamalara. Henüz erken seviyelerdeyim ama her projede biraz daha ilerliyorum.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════
+     STATS — Yetenekler
+═══════════════════════════════ -->
+<div id="screen-stats" class="screen content-screen">
+    <button class="back-btn" onclick="goBack()">← MENU</button>
+    <div class="content-header">
+        <div class="c-tag">// STATS</div>
+        <h1 class="c-title">YETENEKLERİM</h1>
+    </div>
+    <div class="content-body">
+        <div class="stats-grid">
+            <!-- !! DEĞİŞTİR: s-name ve data-w (0-99) !! -->
+
+            <div class="s-cat fi">
+                <div class="s-cat-lbl">// TEKNİK</div>
+                <div class="s-row">
+                    <span class="s-name">HTML / CSS</span>
+                    <div class="s-bar"><div class="s-fill" data-w="80"></div></div>
+                    <span class="s-pct">80</span>
+                </div>
+                <div class="s-row">
+                    <span class="s-name">JavaScript</span>
+                    <div class="s-bar"><div class="s-fill" data-w="60"></div></div>
+                    <span class="s-pct">60</span>
+                </div>
+                <div class="s-row">
+                    <span class="s-name">Python</span>
+                    <div class="s-bar"><div class="s-fill" data-w="60"></div></div>
+                    <span class="s-pct">60</span>
+                </div>
+                <div class="s-row">
+                    <span class="s-name">Git</span>
+                    <div class="s-bar"><div class="s-fill" data-w="50"></div></div>
+                    <span class="s-pct">50</span>
+                </div>
+            </div>
+
+            <div class="s-cat fi" style="animation-delay:.1s">
+                <div class="s-cat-lbl">// TASARIM</div>
+                <div class="s-row">
+                    <span class="s-name">Pixel Art</span>
+                    <div class="s-bar"><div class="s-fill w" data-w="50"></div></div>
+                    <span class="s-pct">50</span>
+                </div>
+                <div class="s-row">
+                    <span class="s-name">2D Art</span>
+                    <div class="s-bar"><div class="s-fill w" data-w="75"></div></div>
+                    <span class="s-pct">75</span>
+                </div>
+                <div class="s-row">
+                    <span class="s-name">3D Art</span>
+                    <div class="s-bar"><div class="s-fill w" data-w="25"></div></div>
+                    <span class="s-pct">25</span>
+                </div>
+            </div>
+
+            <div class="s-cat fi" style="animation-delay:.2s">
+                <div class="s-cat-lbl">// DİLLER</div>
+                <div class="s-row">
+                    <span class="s-name">Türkçe</span>
+                    <div class="s-bar"><div class="s-fill" data-w="100"></div></div>
+                    <span class="s-pct">100</span>
+                </div>
+                <div class="s-row">
+                    <span class="s-name">İngilizce</span>
+                    <div class="s-bar"><div class="s-fill" data-w="60"></div></div>
+                    <span class="s-pct">60</span>
+                </div>
+                <div class="s-row">
+                    <span class="s-name">Almanca</span>
+                    <div class="s-bar"><div class="s-fill" data-w="40"></div></div>
+                    <span class="s-pct">40</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════
+     QUEST LOG — Projeler
+═══════════════════════════════ -->
+<div id="screen-quest" class="screen content-screen">
+    <button class="back-btn" onclick="goBack()">← MENU</button>
+    <div class="content-header">
+        <div class="c-tag">// QUEST LOG</div>
+        <h1 class="c-title">PROJELER</h1>
+    </div>
+    <div class="content-body">
+        <div class="quest-list">
+
+            <a href="https://dashboard-zeta-ten-43.vercel.app" class="q-card fi" target="_blank">
+                <div class="q-num">01</div>
+                <div>
+                    <div class="q-title">Dashboard</div>
+                    <div class="q-desc">HTML ile yapılmış, Vercel üzerinde yayında olan dashboard projesi.</div>
+                    <div class="q-tags">
+                        <span class="q-tag">HTML</span>
+                        <span class="q-tag">CSS</span>
+                    </div>
+                </div>
+                <div class="q-status done">Tamamlandı</div>
+            </a>
+
+            <a href="https://note-pad-steel-three.vercel.app" class="q-card fi" style="animation-delay:.1s" target="_blank">
+                <div class="q-num">02</div>
+                <div>
+                    <div class="q-title">Note Pad</div>
+                    <div class="q-desc">JavaScript ile yapılmış, Vercel üzerinde yayında olan not defteri uygulaması.</div>
+                    <div class="q-tags">
+                        <span class="q-tag">JavaScript</span>
+                        <span class="q-tag">HTML</span>
+                        <span class="q-tag">CSS</span>
+                    </div>
+                </div>
+                <div class="q-status done">Tamamlandı</div>
+            </a>
+
+            <a href="https://fuizz.vercel.app/" class="q-card fi" style="animation-delay:.2s" target="_blank">
+                <div class="q-num">03</div>
+                <div>
+                    <div class="q-title">Fuizz</div>
+                    <div class="q-desc">Kullanıcıların birbirine test hazırlayıp çözebildiği canlı quiz platformu.</div>
+                    <div class="q-tags">
+                        <span class="q-tag">TypeScript</span>
+                        <span class="q-tag">PLpgSQL</span>
+                    </div>
+                </div>
+                <div class="q-status done">Tamamlandı</div>
+            </a>
+
+            <div class="q-card fi" style="animation-delay:.3s">
+                <div class="q-num">04</div>
+                <div>
+                    <div class="q-title">Languide</div>
+                    <div class="q-desc">Yapay zeka destekli yabancı dil öğrenme platformu.</div>
+                    <div class="q-tags">
+                        <span class="q-tag">JavaScript</span>
+                        <span class="q-tag">CSS</span>
+                        <span class="q-tag">AI</span>
+                        <span class="q-tag">🔒 Private</span>
+                    </div>
+                </div>
+                <div class="q-status wip">Devam Ediyor</div>
+            </div>
+
+            <div class="q-card fi" style="animation-delay:.4s">
+                <div class="q-num">05</div>
+                <div>
+                    <div class="q-title">Vintage Store</div>
+                    <div class="q-desc">e-Ticaret sitesi. Ürün listeleme, sepet ve satın alma akışı içeren online mağaza.</div>
+                    <div class="q-tags">
+                        <span class="q-tag">JavaScript</span>
+                        <span class="q-tag">CSS</span>
+                        <span class="q-tag">🔒 Private</span>
+                    </div>
+                </div>
+                <div class="q-status wip">Devam Ediyor</div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════
+     SOCIAL LINK
+═══════════════════════════════ -->
+<div id="screen-social" class="screen content-screen">
+    <button class="back-btn" onclick="goBack()">← MENU</button>
+    <div class="content-header">
+        <div class="c-tag">// SOCIAL LINK</div>
+        <h1 class="c-title">BAĞLANTILAR</h1>
+    </div>
+    <div class="content-body">
+        <div class="social-grid">
+
+            <a href="https://www.instagram.com/twirn_11/" class="sl-card fi" target="_blank">
+                <div class="sl-rank">I</div>
+                <div class="sl-info">
+                    <div class="sl-arcana">// THE MAGICIAN</div>
+                    <div class="sl-platform">Instagram</div>
+                    <div class="sl-handle">@twirn_11</div>
+                </div>
+                <span class="sl-arrow">→</span>
+            </a>
+
+            <a href="https://github.com/I-Twirn-I" class="sl-card fi" style="animation-delay:.1s" target="_blank">
+                <div class="sl-rank">II</div>
+                <div class="sl-info">
+                    <div class="sl-arcana">// THE HIGH PRIESTESS</div>
+                    <div class="sl-platform">GitHub</div>
+                    <div class="sl-handle">@I-Twirn-I</div>
+                </div>
+                <span class="sl-arrow">→</span>
+            </a>
+
+            <a href="https://open.spotify.com/user/313w742fopsb7qqbcyubmj2tnhge?si=74dc374fb15e48cb" class="sl-card fi" style="animation-delay:.2s" target="_blank">
+                <div class="sl-rank">III</div>
+                <div class="sl-info">
+                    <div class="sl-arcana">// THE EMPRESS</div>
+                    <div class="sl-platform">Spotify</div>
+                    <div class="sl-handle">Kuzey Türe</div>
+                </div>
+                <span class="sl-arrow">→</span>
+            </a>
+
+            <a href="https://steamcommunity.com/profiles/76561199037038200/" class="sl-card fi" style="animation-delay:.3s" target="_blank">
+                <div class="sl-rank">IV</div>
+                <div class="sl-info">
+                    <div class="sl-arcana">// THE EMPEROR</div>
+                    <div class="sl-platform">Steam</div>
+                    <div class="sl-handle">Kuzey Türe</div>
+                </div>
+                <span class="sl-arrow">→</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════
+     SYSTEM — İletişim
+═══════════════════════════════ -->
+<div id="screen-system" class="screen content-screen">
+    <button class="back-btn" onclick="goBack()">← MENU</button>
+    <div class="content-header">
+        <div class="c-tag">// SYSTEM</div>
+        <h1 class="c-title">SİSTEM</h1>
+    </div>
+    <div class="content-body">
+        <div class="sys-grid">
+            <div class="sys-box fi">
+                <div class="sys-box-title">// KULLANICI BİLGİLERİ</div>
+                <div class="sys-row"><span class="sys-k">İsim</span>     <span class="sys-v">Kuzey Türe</span></div>
+                <div class="sys-row"><span class="sys-k">E-Posta</span>  <span class="sys-v"><a href="mailto:kuzeyture2008@gmail.com">kuzeyture2008@gmail.com</a></span></div>
+                <div class="sys-row"><span class="sys-k">Konum</span>    <span class="sys-v">İstanbul → Stuttgart</span></div>
+                <div class="sys-row"><span class="sys-k">Durum</span>    <span class="sys-v" style="color:#44ffaa">Aktif ●</span></div>
+            </div>
+            <div class="sys-box fi" style="animation-delay:.1s">
+                <div class="sys-box-title">// SİTE BİLGİLERİ</div>
+                <div class="sys-row"><span class="sys-k">Versiyon</span> <span class="sys-v">1.0.0</span></div>
+                <div class="sys-row"><span class="sys-k">Yapım</span>    <span class="sys-v">HTML / CSS / JS</span></div>
+                <div class="sys-row"><span class="sys-k">İlham</span>    <span class="sys-v">Persona 3 Reload</span></div>
+                <div class="sys-row"><span class="sys-k">Yıl</span>      <span class="sys-v">2025</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+/* Giriş bitti → loop videosu */
+const bgVid = document.getElementById('menu-bg-video');
+if(bgVid){
+    bgVid.addEventListener('ended', () => {
+        bgVid.src = 'persona-loop.mp4';
+        bgVid.loop = true;
+        bgVid.play();
+    });
+    bgVid.play().catch(()=>{});
+}
+
+const wipe = document.getElementById('wipe');
+const navHistory = [];
+let busy = false;
+
+function wait(ms){ return new Promise(r => setTimeout(r, ms)) }
+
+async function navigateTo(targetId){
+    if(busy) return;
+    busy = true;
+
+    const from = document.querySelector('.screen.active');
+    const to   = document.getElementById(targetId);
+    if(!to || from === to){ busy = false; return; }
+
+    navHistory.push(from.id);
+
+    // wipe IN
+    wipe.className = '';
+    void wipe.offsetWidth;
+    wipe.classList.add('in');
+    await wait(230);
+
+    // swap
+    from.classList.remove('active');
+    to.classList.add('active');
+
+    // animate items
+    to.querySelectorAll('.fi').forEach((el,i) => {
+        el.classList.remove('show');
+        setTimeout(() => el.classList.add('show'), i * 80 + 40);
+    });
+
+    // fill stat bars
+    to.querySelectorAll('.s-fill').forEach(b => {
+        b.style.width = '0';
+        setTimeout(() => { b.style.width = (b.dataset.w || 0) + '%'; }, 180);
+    });
+
+    // wipe OUT
+    wipe.classList.remove('in');
+    wipe.classList.add('out');
+    await wait(230);
+    wipe.className = '';
+    busy = false;
+}
+
+async function goBack(){
+    const prev = navHistory.pop() || 'screen-menu';
+    await navigateTo(prev);
+}
+
+// click on menu items
+document.querySelectorAll('.menu-item').forEach(item => {
+    item.addEventListener('click', () => {
+        const t = item.dataset.target;
+        if(t) navigateTo(t);
+    });
+    item.addEventListener('mouseenter', () => {
+        document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('selected'));
+        item.classList.add('selected');
+        selIdx = menuItems.indexOf(item);
+    });
+});
+
+// keyboard
+const menuItems = Array.from(document.querySelectorAll('.menu-item'));
+let selIdx = 0;
+
+document.addEventListener('keydown', e => {
+    const onMenu = document.getElementById('screen-menu').classList.contains('active');
+
+    if(onMenu){
+        if(e.key === 'ArrowDown'){
+            selIdx = (selIdx + 1) % menuItems.length;
+            menuItems.forEach((m,i) => m.classList.toggle('selected', i === selIdx));
+            e.preventDefault();
+        }
+        if(e.key === 'ArrowUp'){
+            selIdx = (selIdx - 1 + menuItems.length) % menuItems.length;
+            menuItems.forEach((m,i) => m.classList.toggle('selected', i === selIdx));
+            e.preventDefault();
+        }
+        if(e.key === 'Enter'){
+            const t = menuItems[selIdx]?.dataset.target;
+            if(t) navigateTo(t);
+        }
+    }
+
+    if(e.key === 'Escape' && !onMenu) goBack();
+});
+</script>
+</body>
+</html>
