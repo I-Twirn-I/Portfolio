@@ -866,6 +866,9 @@ document.querySelectorAll('.menu-item').forEach(item => {
         item.classList.add('selected');
         selIdx = menuItems.indexOf(item);
     });
+    item.addEventListener('mouseleave', () => {
+        item.classList.remove('selected');
+    });
 });
 
 // keyboard
