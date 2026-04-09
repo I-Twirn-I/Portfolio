@@ -333,6 +333,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
 .persona-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start}
 #persona-photo{position:fixed;bottom:0;right:0;height:85vh;max-height:700px;object-fit:contain;object-position:bottom right;z-index:1;pointer-events:none;}
 #screen-persona .content-body{position:relative;z-index:3;}
+.screen-char{position:fixed;bottom:0;height:85vh;max-height:700px;object-fit:contain;object-position:bottom;z-index:1;pointer-events:none;}
+.screen-char.right{right:0;}
+.screen-char.center{left:50%;transform:translateX(-50%);}
+.screen-char.left{left:0;}
+#screen-stats .content-body,#screen-quest .content-body,#screen-social .content-body,#screen-system .content-body{position:relative;z-index:3;}
 
 .p-lbl{
     font-family:'Impact','Arial Narrow',sans-serif;font-style:italic;
@@ -345,7 +350,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
 /* ══════════════════════════════
    STATS — Skills
 ══════════════════════════════ */
-#screen-stats .c-title{color:#ffffff;}
+#screen-stats .c-title{color:#cc0011;}
 
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem}
 
@@ -409,7 +414,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
 /* ══════════════════════════════
    SOCIAL LINK
 ══════════════════════════════ */
-#screen-social .c-title{color:#00eeff;}
+#screen-social .c-title{color:#7b3f00;}
 
 .social-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem}
 
@@ -636,6 +641,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
             </div>
         </div>
     </div>
+    <img src="stats-char.png" class="screen-char right" alt="">
 </div>
 
 <!-- ═══════════════════════════════
@@ -721,6 +727,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
 
         </div>
     </div>
+    <img src="quest-char.png" class="screen-char center" alt="">
 </div>
 
 <!-- ═══════════════════════════════
@@ -776,6 +783,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
             </a>
         </div>
     </div>
+    <img src="social-char.png" class="screen-char right" alt="">
 </div>
 
 <!-- ═══════════════════════════════
@@ -805,6 +813,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
             </div>
         </div>
     </div>
+    <img src="system-char.png" class="screen-char left" alt="">
 </div>
 
 <script>
