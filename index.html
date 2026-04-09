@@ -459,12 +459,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
 /* ══════════════════════════════
    KALICI ARKA PLAN VİDEOSU
 ══════════════════════════════ */
-#menu-bg-video{
+#menu-bg-video, #menu-loop-video{
     position:fixed;top:0;left:0;
     width:100%;height:100%;
     object-fit:cover;
     z-index:0;
 }
+#menu-loop-video{opacity:0;}
 
 /* ── responsive ── */
 @media(max-width:768px){
@@ -484,6 +485,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
 <!-- Kalıcı arka plan videosu — her zaman oynar, tüm ekranlar üstünde değil -->
 <video id="menu-bg-video" autoplay muted playsinline>
     <source src="persona-giris.mp4" type="video/mp4">
+</video>
+<video id="menu-loop-video" muted playsinline loop preload="auto">
+    <source src="persona-loop.mp4" type="video/mp4">
 </video>
 
 <div id="wipe"></div>
@@ -815,11 +819,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
 <script>
 /* Giriş bitti → loop videosu */
 const bgVid = document.getElementById('menu-bg-video');
-if(bgVid){
+const loopVid = document.getElementById('menu-loop-video');
+if(bgVid && loopVid){
+    // Preload loop video silently
+    loopVid.load();
     bgVid.addEventListener('ended', () => {
-        bgVid.src = 'persona-loop.mp4';
-        bgVid.loop = true;
-        bgVid.play();
+        loopVid.play().then(() => {
+            loopVid.style.opacity = '1';
+            bgVid.style.opacity = '0';
+        }).catch(()=>{});
     });
     bgVid.play().catch(()=>{});
 }
