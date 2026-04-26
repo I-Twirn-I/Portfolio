@@ -228,6 +228,46 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
 .menu-item:nth-child(4) .menu-flag{clip-path:polygon(15% 0%,100% 20%,85% 100%,0% 80%)}
 .menu-item:nth-child(5) .menu-flag{clip-path:polygon(0% 20%,85% 0%,100% 80%,15% 100%)}
 
+/* ── Müzik kontrolleri ── */
+#bgm-controls{
+    position:fixed;bottom:1rem;left:1.2rem;z-index:50;
+    display:flex;align-items:center;gap:.6rem;
+}
+#bgm-btn{
+    background:rgba(0,0,0,0.5);
+    border:2px solid rgba(255,255,255,0.3);
+    color:#fff;
+    font-family:'Impact','Arial Narrow',sans-serif;
+    font-style:italic;font-size:.85rem;
+    letter-spacing:2px;padding:.4rem .9rem;cursor:pointer;
+    text-transform:uppercase;transition:all .15s;
+    clip-path:polygon(8px 0%,100% 0%,100% 100%,0% 100%,0% 8px);
+    white-space:nowrap;
+}
+#bgm-btn:hover{background:rgba(0,100,200,0.7);border-color:var(--cyan);}
+#bgm-btn.playing{border-color:var(--cyan);color:var(--cyan);}
+
+#bgm-volume{
+    -webkit-appearance:none;appearance:none;
+    width:80px;height:4px;
+    background:linear-gradient(90deg,var(--cyan) 50%,rgba(255,255,255,0.2) 50%);
+    border:none;outline:none;cursor:pointer;
+    transition:width .15s;
+}
+#bgm-volume::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:12px;height:12px;
+    background:var(--cyan);
+    clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);
+    cursor:pointer;
+}
+#bgm-volume::-moz-range-thumb{
+    width:12px;height:12px;
+    background:var(--cyan);
+    border:none;cursor:pointer;
+    clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);
+}
+
 /* ── Alt sağ kontroller — "Use a Skill / Command" stili ── */
 .menu-controls{
     position:absolute;
@@ -542,7 +582,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
     <source src="persona-loop.mp4" type="video/mp4">
 </video>
 
+<audio id="bgm" loop preload="auto">
+    <source src="Persona3.mp3" type="audio/mpeg">
+</audio>
+
 <div id="wipe"></div>
+<div id="bgm-controls">
+    <button id="bgm-btn" onclick="toggleBgm()">♪ BGM</button>
+    <input id="bgm-volume" type="range" min="0" max="100" value="25" oninput="setBgmVolume(this.value)">
+</div>
 
 <!-- ═══════════════════════════════
      MENU SCREEN
@@ -869,6 +917,43 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
 </div>
 
 <script>
+/* BGM */
+const bgm = document.getElementById('bgm');
+const bgmBtn = document.getElementById('bgm-btn');
+let bgmStarted = false;
+
+function toggleBgm(){
+    if(bgm.paused){
+        bgm.play().catch(()=>{});
+        bgmBtn.textContent = '♪ BGM ON';
+        bgmBtn.classList.add('playing');
+    } else {
+        bgm.pause();
+        bgmBtn.textContent = '♪ BGM OFF';
+        bgmBtn.classList.remove('playing');
+    }
+}
+
+function setBgmVolume(val){
+    bgm.volume = val / 100;
+    const slider = document.getElementById('bgm-volume');
+    slider.style.background = `linear-gradient(90deg,var(--cyan) ${val}%,rgba(255,255,255,0.2) ${val}%)`;
+}
+
+// İlk kullanıcı etkileşiminde otomatik başlat
+function tryAutoplay(){
+    if(bgmStarted) return;
+    bgmStarted = true;
+    bgm.volume = 0.25;
+    document.getElementById('bgm-volume').style.background = 'linear-gradient(90deg,var(--cyan) 25%,rgba(255,255,255,0.2) 25%)';
+    bgm.play().then(()=>{
+        bgmBtn.textContent = '♪ BGM ON';
+        bgmBtn.classList.add('playing');
+    }).catch(()=>{});
+}
+document.addEventListener('click', tryAutoplay, {once:true});
+document.addEventListener('keydown', tryAutoplay, {once:true});
+
 /* Giriş bitti → loop videosu */
 const bgVid = document.getElementById('menu-bg-video');
 const loopVid = document.getElementById('menu-loop-video');
