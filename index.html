@@ -921,6 +921,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
 const bgm = document.getElementById('bgm');
 const bgmBtn = document.getElementById('bgm-btn');
 let bgmStarted = false;
+bgm.load(); // sayfa açılır açılmaz yüklemeye başla
 
 function toggleBgm(){
     if(bgm.paused){
