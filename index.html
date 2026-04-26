@@ -920,8 +920,31 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
 /* BGM */
 const bgm = document.getElementById('bgm');
 const bgmBtn = document.getElementById('bgm-btn');
-let bgmStarted = false;
-bgm.load(); // sayfa açılır açılmaz yüklemeye başla
+let userInteracted = false;
+let audioReady = false;
+bgm.load();
+
+function startBgm(){
+    bgm.volume = 0.25;
+    bgm.play().then(()=>{
+        bgmBtn.textContent = '♪ BGM ON';
+        bgmBtn.classList.add('playing');
+    }).catch(()=>{});
+}
+
+bgm.addEventListener('canplaythrough', ()=>{
+    audioReady = true;
+    if(userInteracted) startBgm();
+}, {once:true});
+
+function tryAutoplay(){
+    if(userInteracted) return;
+    userInteracted = true;
+    if(audioReady) startBgm();
+    // audioReady değilse canplaythrough tetiklenince başlayacak
+}
+document.addEventListener('click', tryAutoplay, {once:true});
+document.addEventListener('keydown', tryAutoplay, {once:true});
 
 function toggleBgm(){
     if(bgm.paused){
@@ -940,20 +963,6 @@ function setBgmVolume(val){
     const slider = document.getElementById('bgm-volume');
     slider.style.background = `linear-gradient(90deg,var(--cyan) ${val}%,rgba(255,255,255,0.2) ${val}%)`;
 }
-
-// İlk kullanıcı etkileşiminde otomatik başlat
-function tryAutoplay(){
-    if(bgmStarted) return;
-    bgmStarted = true;
-    bgm.volume = 0.25;
-    document.getElementById('bgm-volume').style.background = 'linear-gradient(90deg,var(--cyan) 25%,rgba(255,255,255,0.2) 25%)';
-    bgm.play().then(()=>{
-        bgmBtn.textContent = '♪ BGM ON';
-        bgmBtn.classList.add('playing');
-    }).catch(()=>{});
-}
-document.addEventListener('click', tryAutoplay, {once:true});
-document.addEventListener('keydown', tryAutoplay, {once:true});
 
 /* Giriş bitti → loop videosu */
 const bgVid = document.getElementById('menu-bg-video');
