@@ -932,16 +932,22 @@ function startBgm(){
     }).catch(()=>{});
 }
 
+// Sayfa açılır açılmaz dene
 bgm.addEventListener('canplaythrough', ()=>{
     audioReady = true;
-    if(userInteracted) startBgm();
+    bgm.play().then(()=>{
+        userInteracted = true;
+        bgmBtn.textContent = '♪ BGM ON';
+        bgmBtn.classList.add('playing');
+    }).catch(()=>{
+        // Tarayıcı izin vermedi, tıklamaya bekle
+    });
 }, {once:true});
 
 function tryAutoplay(){
     if(userInteracted) return;
     userInteracted = true;
-    if(audioReady) startBgm();
-    // audioReady değilse canplaythrough tetiklenince başlayacak
+    startBgm();
 }
 document.addEventListener('click', tryAutoplay, {once:true});
 document.addEventListener('keydown', tryAutoplay, {once:true});
