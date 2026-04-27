@@ -1030,13 +1030,62 @@ async function goBack(){
     await navigateTo(prev);
 }
 
+/* ── Cursor ses efekti ── */
+let audioCtx = null;
+function getCtx(){ if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); return audioCtx; }
+
+function playCursorSound(){
+    const ctx = getCtx();
+    const t = ctx.currentTime;
+
+    // Noise burst — "whoosh" kısmı
+    const bufLen = Math.floor(ctx.sampleRate * 0.06);
+    const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for(let i = 0; i < bufLen; i++) data[i] = Math.random() * 2 - 1;
+    const noise = ctx.createBufferSource();
+    noise.buffer = buf;
+    const bpf = ctx.createBiquadFilter();
+    bpf.type = 'bandpass'; bpf.frequency.value = 2200; bpf.Q.value = 1.2;
+    const ng = ctx.createGain();
+    ng.gain.setValueAtTime(0.22, t);
+    ng.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+    noise.connect(bpf); bpf.connect(ng); ng.connect(ctx.destination);
+    noise.start(t); noise.stop(t + 0.06);
+
+    // Tonal — "tick" kısmı
+    const osc = ctx.createOscillator();
+    const og = ctx.createGain();
+    osc.connect(og); og.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(1400, t);
+    osc.frequency.exponentialRampToValueAtTime(900, t + 0.07);
+    og.gain.setValueAtTime(0.12, t);
+    og.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+    osc.start(t); osc.stop(t + 0.07);
+}
+
+function playSelectSound(){
+    const ctx = getCtx();
+    const t = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const og = ctx.createGain();
+    osc.connect(og); og.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(800, t);
+    osc.frequency.exponentialRampToValueAtTime(1400, t + 0.1);
+    og.gain.setValueAtTime(0.2, t);
+    og.gain.exponentialRampToValueAtTime(0.001, t + 0.13);
+    osc.start(t); osc.stop(t + 0.13);
+}
+
 // click on menu items — tek handler, double-trigger önlenir
 const menuList = document.querySelector('.menu-list');
 menuList.addEventListener('click', e => {
     const item = e.target.closest('.menu-item');
     if(!item) return;
     const t = item.dataset.target;
-    if(t) navigateTo(t);
+    if(t){ playSelectSound(); navigateTo(t); }
 });
 
 let hoverTimeout = null;
@@ -1048,6 +1097,7 @@ menuList.addEventListener('mouseover', e => {
         document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('selected'));
         item.classList.add('selected');
         selIdx = menuItems.indexOf(item);
+        playCursorSound();
     }, 20);
 });
 
@@ -1067,16 +1117,18 @@ document.addEventListener('keydown', e => {
         if(e.key === 'ArrowDown'){
             selIdx = (selIdx + 1) % menuItems.length;
             menuItems.forEach((m,i) => m.classList.toggle('selected', i === selIdx));
+            playCursorSound();
             e.preventDefault();
         }
         if(e.key === 'ArrowUp'){
             selIdx = (selIdx - 1 + menuItems.length) % menuItems.length;
             menuItems.forEach((m,i) => m.classList.toggle('selected', i === selIdx));
+            playCursorSound();
             e.preventDefault();
         }
         if(e.key === 'Enter'){
             const t = menuItems[selIdx]?.dataset.target;
-            if(t) navigateTo(t);
+            if(t){ playSelectSound(); navigateTo(t); }
         }
     }
 
