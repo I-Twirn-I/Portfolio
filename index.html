@@ -1026,6 +1026,7 @@ async function navigateTo(targetId){
 }
 
 async function goBack(){
+    playSelectSound();
     const prev = navHistory.pop() || 'screen-menu';
     await navigateTo(prev);
 }
