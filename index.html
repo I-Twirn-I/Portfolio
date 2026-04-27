@@ -585,6 +585,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
 <audio id="bgm" loop preload="auto">
     <source src="Persona3.mp3" type="audio/mpeg">
 </audio>
+<audio id="back-sfx" preload="auto">
+    <source src="Re zero respawn Start v.mp3" type="audio/mpeg">
+</audio>
 
 <div id="wipe"></div>
 <div id="bgm-controls">
@@ -1025,8 +1028,11 @@ async function navigateTo(targetId){
     busy = false;
 }
 
+const backSfx = document.getElementById('back-sfx');
+
 async function goBack(){
-    playSelectSound();
+    backSfx.currentTime = 0;
+    backSfx.play().catch(()=>{});
     const prev = navHistory.pop() || 'screen-menu';
     await navigateTo(prev);
 }
