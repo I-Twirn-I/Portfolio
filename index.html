@@ -648,9 +648,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
                 <div class="p-lbl">Role</div>
                 <div class="p-val">Designer</div>
 
-                <div class="p-lbl">Arcana</div>
-                <div class="p-val" style="color:var(--gold)">⬡ The Magician</div>
-
                 <div class="p-lbl">Location</div>
                 <div class="p-val">Istanbul → Stuttgart ●</div>
 
@@ -662,12 +659,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
                 <p class="p-bio">
                     I'm 17 and grew up in Istanbul. I'm moving to Stuttgart soon to study at university. I love working at the intersection of design and code — from pixel art to web projects, from 2D illustration to AI-powered apps. Still early in the journey, but getting better with every project.
                 </p>
-                <div style="margin-top:1.2rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,0.1)">
-                    <div class="p-lbl">Arcana Reading</div>
-                    <p style="font-family:'Caveat',cursive;font-size:1.15rem;color:var(--gold);line-height:1.6;margin-top:.3rem;">
-                        "The Magician represents new beginnings, willpower, and the skill to turn ideas into reality."
-                    </p>
-                </div>
             </div>
         </div>
     </div>
@@ -1039,50 +1030,16 @@ async function goBack(){
     await navigateTo(prev);
 }
 
-/* ── Cursor ses efekti (Web Audio API) ── */
-let audioCtx = null;
-
-function playCursorSound(){
-    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(660, audioCtx.currentTime + 0.08);
-    gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-    osc.start(audioCtx.currentTime);
-    osc.stop(audioCtx.currentTime + 0.1);
-}
-
-function playSelectSound(){
-    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(660, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(1100, audioCtx.currentTime + 0.12);
-    gain.gain.setValueAtTime(0.22, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
-    osc.start(audioCtx.currentTime);
-    osc.stop(audioCtx.currentTime + 0.15);
-}
-
 // click on menu items
 document.querySelectorAll('.menu-item').forEach(item => {
     item.addEventListener('click', () => {
         const t = item.dataset.target;
-        if(t){ playSelectSound(); navigateTo(t); }
+        if(t) navigateTo(t);
     });
     item.addEventListener('mouseenter', () => {
         document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('selected'));
         item.classList.add('selected');
         selIdx = menuItems.indexOf(item);
-        playCursorSound();
     });
     item.addEventListener('mouseleave', () => {
         item.classList.remove('selected');
@@ -1100,18 +1057,16 @@ document.addEventListener('keydown', e => {
         if(e.key === 'ArrowDown'){
             selIdx = (selIdx + 1) % menuItems.length;
             menuItems.forEach((m,i) => m.classList.toggle('selected', i === selIdx));
-            playCursorSound();
             e.preventDefault();
         }
         if(e.key === 'ArrowUp'){
             selIdx = (selIdx - 1 + menuItems.length) % menuItems.length;
             menuItems.forEach((m,i) => m.classList.toggle('selected', i === selIdx));
-            playCursorSound();
             e.preventDefault();
         }
         if(e.key === 'Enter'){
             const t = menuItems[selIdx]?.dataset.target;
-            if(t){ playSelectSound(); navigateTo(t); }
+            if(t) navigateTo(t);
         }
     }
 
