@@ -588,6 +588,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
 <audio id="back-sfx" preload="auto">
     <source src="Re zero respawn Start v.mp3" type="audio/mpeg">
 </audio>
+<audio id="card-sfx" preload="auto">
+    <source src="weeyaah End.mp3" type="audio/mpeg">
+</audio>
 
 <div id="wipe"></div>
 <div id="bgm-controls">
@@ -1029,6 +1032,16 @@ async function navigateTo(targetId){
 }
 
 const backSfx = document.getElementById('back-sfx');
+const cardSfx = document.getElementById('card-sfx');
+
+function playCardSound(){
+    cardSfx.currentTime = 0;
+    cardSfx.play().catch(()=>{});
+}
+
+document.querySelectorAll('.q-card, .sl-card').forEach(card => {
+    card.addEventListener('click', playCardSound);
+});
 
 async function goBack(){
     backSfx.currentTime = 0;
