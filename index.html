@@ -1058,31 +1058,31 @@ function playCursorSound(){
     const ctx = getCtx();
     const t = ctx.currentTime;
 
-    // Noise burst — "whoosh" kısmı
-    const bufLen = Math.floor(ctx.sampleRate * 0.06);
+    // Kısa click transient
+    const bufLen = Math.floor(ctx.sampleRate * 0.012);
     const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
     const data = buf.getChannelData(0);
-    for(let i = 0; i < bufLen; i++) data[i] = Math.random() * 2 - 1;
+    for(let i = 0; i < bufLen; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufLen);
     const noise = ctx.createBufferSource();
     noise.buffer = buf;
-    const bpf = ctx.createBiquadFilter();
-    bpf.type = 'bandpass'; bpf.frequency.value = 2200; bpf.Q.value = 1.2;
+    const hpf = ctx.createBiquadFilter();
+    hpf.type = 'highpass'; hpf.frequency.value = 3500;
     const ng = ctx.createGain();
-    ng.gain.setValueAtTime(0.22, t);
-    ng.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
-    noise.connect(bpf); bpf.connect(ng); ng.connect(ctx.destination);
-    noise.start(t); noise.stop(t + 0.06);
+    ng.gain.setValueAtTime(0.18, t);
+    ng.gain.exponentialRampToValueAtTime(0.001, t + 0.012);
+    noise.connect(hpf); hpf.connect(ng); ng.connect(ctx.destination);
+    noise.start(t); noise.stop(t + 0.012);
 
-    // Tonal — "tick" kısmı
+    // P3 tarzı yukarı sweep — temiz triangle dalga
     const osc = ctx.createOscillator();
     const og = ctx.createGain();
     osc.connect(og); og.connect(ctx.destination);
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(1400, t);
-    osc.frequency.exponentialRampToValueAtTime(900, t + 0.07);
-    og.gain.setValueAtTime(0.12, t);
-    og.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
-    osc.start(t); osc.stop(t + 0.07);
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(520, t);
+    osc.frequency.exponentialRampToValueAtTime(1050, t + 0.045);
+    og.gain.setValueAtTime(0.16, t);
+    og.gain.exponentialRampToValueAtTime(0.001, t + 0.055);
+    osc.start(t); osc.stop(t + 0.055);
 }
 
 function playSelectSound(){
